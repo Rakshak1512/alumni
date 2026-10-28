@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <h1>Welcome, {{ user['name'] }} 👋</h1>
+        <p>Explore verified alumni mentors, apply for jobs/internships, and accelerate your career.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('search_alumni') }}" class="btn btn-primary">
+            <span>🔍 Find Alumni Mentors</span>
+        </a>
+    </div>
+</div>
+
+<!-- Quick Action Shortcuts -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+    <div class="card" style="margin-bottom: 0; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+        <div style="width: 46px; height: 46px; border-radius: var(--radius-md); background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+            💼
+        </div>
+        <div>
+            <div style="font-weight: 700; font-size: 0.95rem;">Career Postings</div>
+            <a href="{{ url_for('list_postings') }}" style="font-size: 0.82rem; font-weight: 600;">Browse All Postings →</a>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 0; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+        <div style="width: 46px; height: 46px; border-radius: var(--radius-md); background: #fdf2f8; color: #db2777; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+            🤖
+        </div>
+        <div>
+            <div style="font-weight: 700; font-size: 0.95rem;">AI Assistant</div>
+            <a href="{{ url_for('chatbot') }}" style="font-size: 0.82rem; font-weight: 600;">Ask Career Questions →</a>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 0; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+        <div style="width: 46px; height: 46px; border-radius: var(--radius-md); background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+            📚
+        </div>
+        <div>
+            <div style="font-weight: 700; font-size: 0.95rem;">Study Materials</div>
+            <a href="{{ url_for('list_resources') }}" style="font-size: 0.82rem; font-weight: 600;">Access Resources →</a>
+        </div>
+    </div>
+</div>
+
+<!-- Latest Postings Card -->
+<div class="card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); background: #ffffff;">
+        <div>
+            <h3 style="font-size: 1.15rem; margin: 0;">Featured Career Opportunities</h3>
+            <p style="font-size: 0.85rem; margin: 0; color: var(--text-muted);">Latest internships and full-time jobs posted by verified alumni</p>
+        </div>
+        <a href="{{ url_for('list_postings') }}" class="btn btn-sm btn-secondary">See All Postings →</a>
+    </div>
+
+    {% if postings %}
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Position Title</th>
+                    <th>Type</th>
+                    <th>Posted By</th>
+                    <th>Company</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in postings %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--text-main); font-size: 0.95rem;">{{ p['title'] }}</strong>
+                    </td>
+                    <td>
+                        <span class="tag {% if p['type'] == 'job' %}tag-primary{% else %}tag-success{% endif %}">
+                            {{ p['type'] }}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="font-weight: 600; color: var(--text-main);">{{ p['alumni_name'] }}</span>
+                    </td>
+                    <td>
+                        <span class="tag tag-neutral">{{ p['company'] or 'Enterprise' }}</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <a href="{{ url_for('list_postings', search=p['title']) }}" class="btn btn-sm btn-primary">
+                            Details →
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="margin: 0; border: none; border-radius: 0;">
+        <div class="empty-state-icon">💼</div>
+        <h3>No postings available right now</h3>
+        <p>Check back soon or explore the alumni directory to connect with alumni directly.</p>
+        <a href="{{ url_for('search_alumni') }}" class="btn btn-primary">Search Alumni Directory</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

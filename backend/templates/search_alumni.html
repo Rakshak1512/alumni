@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <h1>Alumni Directory & Mentors</h1>
+        <p>Discover and connect with verified alumni working across industries worldwide.</p>
+    </div>
+</div>
+
+<!-- Search Filters Card -->
+<div class="card" style="margin-bottom: 2rem;">
+    <form method="GET" style="background: transparent; padding: 0; border: none; box-shadow: none;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: flex-end;">
+            <div>
+                <label for="branch">Branch / Department</label>
+                <input type="text" id="branch" name="branch" value="{{ branch or '' }}" placeholder="e.g. Computer Science, ECE">
+            </div>
+
+            <div>
+                <label for="company">Company / Organization</label>
+                <input type="text" id="company" name="company" value="{{ company or '' }}" placeholder="e.g. Google, Microsoft">
+            </div>
+
+            <div>
+                <label for="grad_year">Graduation Year</label>
+                <input type="number" id="grad_year" name="grad_year" value="{{ grad_year or '' }}" placeholder="e.g. 2022">
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="margin: 0; width: 100%;">
+                    🔍 Search
+                </button>
+                {% if branch or company or grad_year %}
+                <a href="{{ url_for('search_alumni') }}" class="btn btn-secondary" style="margin: 0;">Reset</a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Results Section -->
+<div class="card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); background: #ffffff;">
+        <h3 style="font-size: 1.15rem; margin: 0;">Verified Alumni ({{ results|length }})</h3>
+    </div>
+
+    {% if results %}
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Alumni</th>
+                    <th>Branch</th>
+                    <th>Current Company</th>
+                    <th>Batch</th>
+                    <th>Location</th>
+                    <th style="text-align: right;">Connect</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in results %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--gradient-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; flex-shrink: 0;">
+                                {{ a['name'][0] | upper }}
+                            </div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                    <strong style="color: var(--text-main);">{{ a['name'] }}</strong>
+                                    <span title="Verified Alumni" style="color: var(--success); font-size: 0.9rem;">✓</span>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">{{ a['email'] }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="tag tag-neutral">{{ a['branch'] or 'Alumni' }}</span>
+                    </td>
+                    <td>
+                        <strong>{{ a['company'] or 'Industry Professional' }}</strong>
+                    </td>
+                    <td>
+                        <span class="tag tag-neutral">{{ a['grad_year'] or 'Alumni' }}</span>
+                    </td>
+                    <td>
+                        <span style="color: var(--text-muted);">📍 {{ a['location'] or 'Global' }}</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <a href="{{ url_for('chat', other_id=a['id']) }}" class="btn btn-sm btn-primary">
+                            💬 Message
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="margin: 0; border: none; border-radius: 0;">
+        <div class="empty-state-icon">🔍</div>
+        <h3>No alumni found matching criteria</h3>
+        <p>Try broadening your search or clearing the branch/company filters to view all verified alumni.</p>
+        <a href="{{ url_for('search_alumni') }}" class="btn btn-secondary">Clear Filters</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

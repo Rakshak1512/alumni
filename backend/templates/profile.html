@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <h1>Your Profile & Account</h1>
+        <p>Manage your public persona, verify your details, and update your profile picture.</p>
+    </div>
+</div>
+
+<div class="profile-container">
+    <div class="profile-card">
+        <!-- Banner -->
+        <div class="profile-banner"></div>
+
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+                <div class="profile-avatar-wrapper">
+                    {% if user['profile_pic'] %}
+                    <img src="{{ url_for('static', filename=user['profile_pic']) }}" alt="{{ user['name'] }}" class="profile-avatar-img">
+                    {% else %}
+                    <div class="profile-avatar-placeholder">
+                        {{ user['name'][0] | upper }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <form method="POST" action="{{ url_for('upload_profile_picture') }}" enctype="multipart/form-data" style="background: transparent; border: none; box-shadow: none; padding: 0; display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="file" name="picture" accept="image/*" required style="font-size: 0.8rem; padding: 0.35rem 0.65rem;">
+                        <button type="submit" class="btn btn-sm btn-primary" style="margin: 0;">Upload</button>
+                    </form>
+                </div>
+            </div>
+
+            <div style="margin-top: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <h2 style="font-size: 1.75rem; color: var(--text-main); margin: 0;">{{ user['name'] }}</h2>
+                    {% if user['role'] == 'alumni' and user['status'] == 'active' %}
+                    <span title="Verified Alumni" style="color: var(--success); font-size: 1.25rem; font-weight: bold;">✓ Verified</span>
+                    {% endif %}
+                </div>
+
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">{{ user['email'] }}</p>
+
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+                    <span class="tag {% if user['role'] == 'alumni' %}tag-primary{% elif user['role'] == 'faculty' %}tag-warning{% else %}tag-neutral{% endif %}" style="font-size: 0.85rem; padding: 0.35rem 0.9rem;">
+                        {{ user['role'] }}
+                    </span>
+                    {% if user['role'] == 'alumni' %}
+                    <span class="tag {% if user['status'] == 'active' %}tag-success{% else %}tag-warning{% endif %}" style="font-size: 0.85rem; padding: 0.35rem 0.9rem;">
+                        Status: {{ user['status'] }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="profile-details-grid">
+                <div class="profile-detail-item">
+                    <div class="profile-detail-icon">🎓</div>
+                    <div>
+                        <div class="profile-detail-label">Academic Branch</div>
+                        <div class="profile-detail-val">{{ user['branch'] or 'Not Specified' }}</div>
+                    </div>
+                </div>
+
+                <div class="profile-detail-item">
+                    <div class="profile-detail-icon">📅</div>
+                    <div>
+                        <div class="profile-detail-label">Graduation Year</div>
+                        <div class="profile-detail-val">{{ user['grad_year'] or 'Current Student / Faculty' }}</div>
+                    </div>
+                </div>
+
+                <div class="profile-detail-item">
+                    <div class="profile-detail-icon">🏢</div>
+                    <div>
+                        <div class="profile-detail-label">Company / Workplace</div>
+                        <div class="profile-detail-val">{{ user['company'] or 'Academic Institution' }}</div>
+                    </div>
+                </div>
+
+                <div class="profile-detail-item">
+                    <div class="profile-detail-icon">📍</div>
+                    <div>
+                        <div class="profile-detail-label">Current Location</div>
+                        <div class="profile-detail-val">{{ user['location'] or 'Campus' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

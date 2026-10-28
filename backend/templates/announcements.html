@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <h1>Campus Bulletins & Announcements</h1>
+        <p>Official announcements, upcoming alumni meetups, webinars, and placement updates.</p>
+    </div>
+</div>
+
+<div style="max-width: 820px; margin: 0 auto;">
+    {% if user['role'] in ['admin', 'faculty'] %}
+    <!-- Announcement Creation Form -->
+    <div class="card" style="margin-bottom: 2.5rem;">
+        <div class="card-header">
+            <h3 class="card-title">📢 Broadcast New Announcement</h3>
+        </div>
+        <form method="POST" style="background: transparent; padding: 0; border: none; box-shadow: none;">
+            <div class="form-group">
+                <label for="title">Announcement Subject / Title <span style="color: var(--danger);">*</span></label>
+                <input type="text" id="title" name="title" placeholder="e.g. Annual Alumni Reunion 2026 / Campus Drive Notice" required>
+            </div>
+
+            <div class="form-group">
+                <label for="content">Announcement Message <span style="color: var(--danger);">*</span></label>
+                <textarea id="content" name="content" rows="4" placeholder="Write full details, dates, zoom links, or instructions..." required></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary">
+                    <span>Broadcast Announcement</span> 📢
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Announcements List -->
+    {% if items %}
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% for a in items %}
+        <div class="card" style="padding: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.85rem; flex-wrap: wrap;">
+                <h3 style="font-size: 1.25rem; color: var(--text-main); margin: 0;">{{ a['title'] }}</h3>
+                <span class="tag tag-primary">📢 Official Notice</span>
+            </div>
+
+            <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6; white-space: pre-line; margin-bottom: 1.25rem;">
+                {{ a['content'] }}
+            </p>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.85rem; border-top: 1px solid var(--border-light); font-size: 0.82rem; color: var(--text-muted);">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>✍️ Posted by: <strong>{{ a['author'] }}</strong></span>
+                </div>
+                <div>
+                    <span>📅 {{ a['created_at'] }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📢</div>
+        <h3>No announcements yet</h3>
+        <p>Stay tuned! Official college bulletins and event updates will appear here.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

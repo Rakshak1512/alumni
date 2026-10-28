@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <h1>Admin User Management</h1>
+        <p>View, search, and filter all registered students, alumni, faculty, and administrators.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Search & Filter Controls -->
+<div class="card" style="margin-bottom: 2rem;">
+    <form method="GET" action="{{ url_for('admin_users') }}" style="background: transparent; padding: 0; border: none; box-shadow: none;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: flex-end;">
+            <div>
+                <label for="search">Search by Name or Email</label>
+                <input type="text" id="search" name="search" value="{{ search or '' }}" placeholder="e.g. John, student@college.edu">
+            </div>
+
+            <div>
+                <label for="role">Filter by Role</label>
+                <select id="role" name="role">
+                    <option value="" {% if not role_filter %}selected{% endif %}>All Roles</option>
+                    <option value="student" {% if role_filter == 'student' %}selected{% endif %}>🎓 Student</option>
+                    <option value="alumni" {% if role_filter == 'alumni' %}selected{% endif %}>💼 Alumni</option>
+                    <option value="faculty" {% if role_filter == 'faculty' %}selected{% endif %}>👨‍🏫 Faculty</option>
+                    <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>🛡️ Admin</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="status">Filter by Status</label>
+                <select id="status" name="status">
+                    <option value="" {% if not status_filter %}selected{% endif %}>All Statuses</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="margin: 0; width: 100%;">
+                    🔍 Apply Filters
+                </button>
+                {% if search or role_filter or status_filter %}
+                <a href="{{ url_for('admin_users') }}" class="btn btn-secondary" style="margin: 0;">Reset</a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Users Table Card -->
+<div class="card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); background: #ffffff;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <h3 style="font-size: 1.15rem; margin: 0;">Registered Users</h3>
+            <span class="tag tag-primary">{{ users_list|length }} user{% if users_list|length != 1 %}s{% endif %}</span>
+        </div>
+    </div>
+
+    {% if users_list %}
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Branch</th>
+                    <th>Graduation Year</th>
+                    <th>Company</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users_list %}
+                <tr>
+                    <td>
+                        <span style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem;">#{{ u['id'] }}</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            {% if u['profile_pic'] %}
+                            <img src="{{ url_for('static', filename=u['profile_pic']) }}" alt="{{ u['name'] }}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover;">
+                            {% else %}
+                            <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--gradient-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">
+                                {{ u['name'][0] | upper }}
+                            </div>
+                            {% endif %}
+                            <strong style="color: var(--text-main); font-size: 0.95rem;">{{ u['name'] }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">{{ u['email'] }}</span>
+                    </td>
+                    <td>
+                        <span class="tag {% if u['role'] == 'admin' %}tag-danger{% elif u['role'] == 'alumni' %}tag-primary{% elif u['role'] == 'faculty' %}tag-warning{% else %}tag-neutral{% endif %}">
+                            {{ u['role'] }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="tag tag-neutral">{{ u['branch'] or '—' }}</span>
+                    </td>
+                    <td>
+                        <span style="color: var(--text-main); font-size: 0.9rem;">{{ u['grad_year'] or '—' }}</span>
+                    </td>
+                    <td>
+                        <strong style="color: var(--text-main); font-size: 0.9rem;">{{ u['company'] or '—' }}</strong>
+                    </td>
+                    <td>
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">{{ u['location'] or '—' }}</span>
+                    </td>
+                    <td>
+                        <span class="tag {% if u['status'] == 'active' %}tag-success{% else %}tag-warning{% endif %}">
+                            {{ u['status'] }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="margin: 0; border: none; border-radius: 0;">
+        <div class="empty-state-icon">👥</div>
+        <h3>No users found</h3>
+        <p>No registered user accounts match your search and filter criteria.</p>
+        <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">Clear Filters</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

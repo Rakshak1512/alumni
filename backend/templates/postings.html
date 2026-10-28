@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <h1>Career & Internship Opportunities</h1>
+        <p>Explore verified full-time roles, internships, and referral opportunities posted by our alumni.</p>
+    </div>
+    {% if user['role'] in ['alumni', 'admin'] %}
+    <div>
+        <a href="{{ url_for('new_posting') }}" class="btn btn-primary">
+            <span>➕ Post an Opportunity</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modern Filter Bar -->
+<div class="card" style="margin-bottom: 2rem;">
+    <form method="GET" style="background: transparent; padding: 0; border: none; box-shadow: none;">
+        <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 2; min-width: 240px;">
+                <label for="search">Keyword Search</label>
+                <input type="text" id="search" name="search" value="{{ search or '' }}" placeholder="Search by title, skills, description...">
+            </div>
+            <div style="flex: 1; min-width: 160px;">
+                <label for="type">Position Type</label>
+                <select id="type" name="type">
+                    <option value="" {% if not posting_type %}selected{% endif %}>All Types</option>
+                    <option value="job" {% if posting_type == 'job' %}selected{% endif %}>💼 Full-Time Jobs</option>
+                    <option value="internship" {% if posting_type == 'internship' %}selected{% endif %}>🎓 Internships</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="margin: 0;">Filter Results</button>
+                {% if search or posting_type %}
+                <a href="{{ url_for('list_postings') }}" class="btn btn-secondary" style="margin: 0;">Reset</a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Postings List -->
+{% if postings %}
+<div style="display: flex; flex-direction: column; gap: 1.25rem;">
+    {% for p in postings %}
+    <div class="card" style="padding: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
+                    <h2 style="font-size: 1.35rem; color: var(--text-main); margin: 0;">{{ p['title'] }}</h2>
+                    <span class="tag {% if p['type'] == 'job' %}tag-primary{% else %}tag-success{% endif %}">
+                        {{ p['type'] }}
+                    </span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                    <span>🏢 <strong>{{ p['company'] or 'Enterprise Partner' }}</strong></span>
+                    <span>•</span>
+                    <span>Posted by {{ p['alumni_name'] }}</span>
+                </div>
+            </div>
+
+            {% if p['apply_link'] %}
+            <a href="{{ p['apply_link'] }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                <span>Apply Directly</span> →
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Tags and Requirements Grid -->
+        <div style="display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 1.25rem;">
+            {% if p['location'] %}
+            <span class="tag tag-neutral">📍 {{ p['location'] }}</span>
+            {% endif %}
+            {% if p['experience'] %}
+            <span class="tag tag-neutral">⏳ Exp: {{ p['experience'] }}</span>
+            {% endif %}
+            {% if p['education'] %}
+            <span class="tag tag-neutral">🎓 {{ p['education'] }}</span>
+            {% endif %}
+        </div>
+
+        {% if p['skills'] %}
+        <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); margin-bottom: 1rem; font-size: 0.88rem;">
+            <strong style="color: var(--text-main);">Required Skills:</strong>
+            <span style="color: var(--text-muted); margin-left: 0.35rem;">{{ p['skills'] }}</span>
+        </div>
+        {% endif %}
+
+        <div style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; white-space: pre-line;">
+            {{ p['description'] }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">💼</div>
+    <h3>No postings found</h3>
+    <p>We couldn't find any opportunities matching your filter criteria. Try searching with different keywords.</p>
+    <a href="{{ url_for('list_postings') }}" class="btn btn-secondary">Clear Filters</a>
+</div>
+{% endif %}
+
+{% endblock %}

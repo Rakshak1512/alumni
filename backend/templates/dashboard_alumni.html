@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <h1>Welcome Back, {{ user['name'] }} 👋</h1>
+        <p>Manage your posted job opportunities, mentor students, and share career guidance.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('new_posting') }}" class="btn btn-primary">
+            <span>➕ Post Job / Internship</span>
+        </a>
+    </div>
+</div>
+
+<!-- Quick Shortcuts Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+    <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem;">
+        <div style="width: 50px; height: 50px; border-radius: var(--radius-md); background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            💼
+        </div>
+        <div>
+            <div style="font-size: 1.25rem; font-weight: 800;">{{ my_postings|length }}</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">Active Postings</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem;">
+        <div style="width: 50px; height: 50px; border-radius: var(--radius-md); background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            💬
+        </div>
+        <div>
+            <div style="font-size: 1.1rem; font-weight: 700;">Student Mentorship</div>
+            <a href="{{ url_for('messages_list') }}" style="font-size: 0.85rem; font-weight: 600;">Open Messages →</a>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 0; display: flex; align-items: center; gap: 1.25rem;">
+        <div style="width: 50px; height: 50px; border-radius: var(--radius-md); background: #fffbeb; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            📢
+        </div>
+        <div>
+            <div style="font-size: 1.1rem; font-weight: 700;">Campus Bulletins</div>
+            <a href="{{ url_for('announcements') }}" style="font-size: 0.85rem; font-weight: 600;">View Announcements →</a>
+        </div>
+    </div>
+</div>
+
+<!-- My Postings Section -->
+<div class="card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); background: #ffffff;">
+        <h3 style="font-size: 1.15rem; margin: 0;">Your Published Postings</h3>
+        <a href="{{ url_for('new_posting') }}" class="btn btn-sm btn-secondary">+ New Posting</a>
+    </div>
+
+    {% if my_postings %}
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Opportunity Title</th>
+                    <th>Type</th>
+                    <th>Created On</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in my_postings %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--text-main); font-size: 0.95rem;">{{ p['title'] }}</strong>
+                    </td>
+                    <td>
+                        <span class="tag {% if p['type'] == 'job' %}tag-primary{% else %}tag-success{% endif %}">
+                            {{ p['type'] }}
+                        </span>
+                    </td>
+                    <td><span style="color: var(--text-muted);">{{ p['created_at'] }}</span></td>
+                    <td style="text-align: right;">
+                        <a href="{{ url_for('list_postings', search=p['title']) }}" class="btn btn-sm btn-secondary">
+                            View Live →
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="margin: 0; border: none; border-radius: 0;">
+        <div class="empty-state-icon">💼</div>
+        <h3>No postings yet</h3>
+        <p>Help current students jumpstart their careers by sharing openings at your company or team.</p>
+        <a href="{{ url_for('new_posting') }}" class="btn btn-primary">Publish Your First Opportunity</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

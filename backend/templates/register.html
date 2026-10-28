@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="login-box" style="max-width: 580px;">
+        <div class="login-header">
+            <div class="login-icon">✨</div>
+            <h1>Create Account</h1>
+            <p class="welcome">Join our campus network of verified students, alumni, and faculty</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            <!-- Role Selection -->
+            <div class="form-group">
+                <label for="role">I am registering as <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <select name="role" id="role" onchange="toggleFields()" required>
+                        <option value="student">🎓 Student</option>
+                        <option value="alumni">💼 Alumni (Requires Admin Verification)</option>
+                        <option value="faculty">👨‍🏫 Faculty / Staff</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Full Name -->
+            <div class="form-group">
+                <label for="name">Full Name <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="name" name="name" placeholder="John Doe" required autocomplete="name">
+                </div>
+            </div>
+
+            <!-- Email Address -->
+            <div class="form-group">
+                <label for="email">Email Address <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="email" id="email" name="email" placeholder="name@college.edu" required autocomplete="email">
+                </div>
+            </div>
+
+            <!-- Student & Alumni: Username -->
+            <div class="form-group" id="usernameGroup">
+                <label for="username">Username <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="username" name="username" placeholder="e.g. john_doe" autocomplete="username">
+                </div>
+            </div>
+
+            <!-- Student & Alumni: UUCMS ID -->
+            <div class="form-group" id="uucmsGroup">
+                <label for="uucms_id">UUCMS ID <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="uucms_id" name="uucms_id" placeholder="e.g. U03AC21S0012">
+                </div>
+            </div>
+
+            <!-- Alumni: Last Year UUCMS ID -->
+            <div class="form-group" id="lastYearUucmsGroup" style="display: none;">
+                <label for="last_year_uucms_id">Last Year UUCMS ID <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="last_year_uucms_id" name="last_year_uucms_id" placeholder="e.g. U03AC20S0012">
+                </div>
+            </div>
+
+            <!-- Faculty: Faculty ID -->
+            <div class="form-group" id="facultyIdGroup" style="display: none;">
+                <label for="faculty_id">Faculty ID <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="faculty_id" name="faculty_id" placeholder="e.g. FAC1042">
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password">Password <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="password" name="password" id="password" placeholder="Create a strong password" required autocomplete="new-password">
+                    <span class="eye" onclick="togglePassword()" title="Toggle password visibility">👁️</span>
+                </div>
+            </div>
+
+            <!-- Student & Alumni: Branch -->
+            <div class="form-group" id="branchGroup">
+                <label for="branch">Branch / Department <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="branch" name="branch" placeholder="e.g. Computer Science & Engineering">
+                </div>
+            </div>
+
+            <!-- Faculty: Department -->
+            <div class="form-group" id="departmentGroup" style="display: none;">
+                <label for="department">Department <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="department" name="department" placeholder="e.g. Computer Science & Engineering">
+                </div>
+            </div>
+
+            <!-- Alumni Verification Fields -->
+            <div id="alumni-fields" style="display:none; animation: fadeIn 0.3s ease-out; background: var(--bg-main, #f8fafc); padding: 1.25rem; border-radius: var(--radius-md, 12px); margin-bottom: 1.25rem; border: 1px dashed var(--border-light, #cbd5e1);">
+                <div style="font-size: 0.9rem; font-weight: 700; color: var(--primary, #3b82f6); margin-bottom: 1rem;">
+                    🎓 Alumni Verification & Details
+                </div>
+
+                <div class="form-group">
+                    <label for="cgpa">Final CGPA (0.0 to 10.0) <span style="color: var(--danger, #ef4444);">*</span></label>
+                    <div class="input-box">
+                        <input type="number" id="cgpa" name="cgpa" step="0.01" min="0" max="10" placeholder="e.g. 8.75">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="certificate">Degree / Graduation Certificate <span style="color: var(--danger, #ef4444);">*</span> <span class="hint">(PDF, PNG, JPG - Max 10MB)</span></label>
+                    <div class="input-box">
+                        <input type="file" id="certificate" name="certificate" accept=".pdf,.png,.jpg,.jpeg" style="padding: 0.5rem;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="grad_year">Graduation Year</label>
+                    <div class="input-box">
+                        <input type="number" id="grad_year" name="grad_year" placeholder="e.g. 2022" min="1950" max="2035">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="company">Current Company / Organization</label>
+                    <div class="input-box">
+                        <input type="text" id="company" name="company" placeholder="e.g. Google, Microsoft, Startup">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="location">Current Location / City</label>
+                    <div class="input-box">
+                        <input type="text" id="location" name="location" placeholder="e.g. Bangalore, San Francisco, London">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="login-btn" id="regSubmitBtn">
+                <span id="regSubmitText">Create Student Account</span> →
+            </button>
+        </form>
+
+        <p class="register">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Sign In</a>
+        </p>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const password = document.getElementById("password");
+    const eye = document.querySelector(".eye");
+    if (password.type === "password") {
+        password.type = "text";
+        eye.innerHTML = "🙈";
+    } else {
+        password.type = "password";
+        eye.innerHTML = "👁️";
+    }
+}
+
+function toggleFields() {
+    const role = document.getElementById('role').value;
+    const alumniFields = document.getElementById('alumni-fields');
+    const usernameGroup = document.getElementById('usernameGroup');
+    const uucmsGroup = document.getElementById('uucmsGroup');
+    const lastYearUucmsGroup = document.getElementById('lastYearUucmsGroup');
+    const facultyIdGroup = document.getElementById('facultyIdGroup');
+    const branchGroup = document.getElementById('branchGroup');
+    const departmentGroup = document.getElementById('departmentGroup');
+    const submitText = document.getElementById('regSubmitText');
+
+    if (role === 'student') {
+        usernameGroup.style.display = 'block';
+        uucmsGroup.style.display = 'block';
+        lastYearUucmsGroup.style.display = 'none';
+        facultyIdGroup.style.display = 'none';
+        branchGroup.style.display = 'block';
+        departmentGroup.style.display = 'none';
+        alumniFields.style.display = 'none';
+        submitText.textContent = 'Create Student Account';
+    } else if (role === 'alumni') {
+        usernameGroup.style.display = 'block';
+        uucmsGroup.style.display = 'block';
+        lastYearUucmsGroup.style.display = 'block';
+        facultyIdGroup.style.display = 'none';
+        branchGroup.style.display = 'block';
+        departmentGroup.style.display = 'none';
+        alumniFields.style.display = 'block';
+        submitText.textContent = 'Submit Alumni Application';
+    } else if (role === 'faculty') {
+        usernameGroup.style.display = 'none';
+        uucmsGroup.style.display = 'none';
+        lastYearUucmsGroup.style.display = 'none';
+        facultyIdGroup.style.display = 'block';
+        branchGroup.style.display = 'none';
+        departmentGroup.style.display = 'block';
+        alumniFields.style.display = 'none';
+        submitText.textContent = 'Create Faculty Account';
+    }
+}
+toggleFields();
+</script>
+{% endblock %}

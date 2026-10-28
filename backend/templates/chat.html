@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="max-width: 820px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <a href="{{ url_for('messages_list') }}" class="btn btn-secondary btn-sm">
+            ← Back to All Messages
+        </a>
+        <a href="{{ url_for('video_call', other_id=other_user['id']) }}" target="_blank" class="btn btn-primary btn-sm">
+            <span>📹 Launch Video Session</span>
+        </a>
+    </div>
+
+    <!-- Chat Box Component -->
+    <div class="chat-wrapper">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="chat-user-profile">
+                {% if other_user['profile_pic'] %}
+                <img src="{{ url_for('static', filename=other_user['profile_pic']) }}" alt="{{ other_user['name'] }}" class="chat-avatar">
+                {% else %}
+                <div class="chat-avatar">
+                    {{ other_user['name'][0] | upper }}
+                </div>
+                {% endif %}
+                <div>
+                    <h3 style="font-size: 1.05rem; margin: 0; color: var(--text-main);">{{ other_user['name'] }}</h3>
+                    <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--text-muted);">
+                        <span class="tag tag-neutral" style="padding: 0.15rem 0.5rem; font-size: 0.7rem;">{{ other_user['role'] }}</span>
+                        {% if other_user['company'] %}<span>• {{ other_user['company'] }}</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <span class="tag tag-success" style="font-size: 0.72rem;">● Active</span>
+        </div>
+
+        <!-- Chat Body Messages -->
+        <div class="chat-body" id="chatBody">
+            {% if chat_messages %}
+                {% for msg in chat_messages %}
+                    {% if msg['sender_id'] == user['id'] %}
+                    <div class="chat-message sent">
+                        <div class="message-bubble">
+                            {{ msg['content'] }}
+                        </div>
+                        <span class="message-meta">{{ msg['created_at'] or 'Just now' }}</span>
+                    </div>
+                    {% else %}
+                    <div class="chat-message received">
+                        <div class="message-bubble">
+                            {{ msg['content'] }}
+                        </div>
+                        <span class="message-meta">{{ msg['created_at'] or 'Just now' }}</span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="empty-state" style="margin: auto; border: none; background: transparent; padding: 2rem 1rem;">
+                    <div class="empty-state-icon" style="font-size: 2.5rem;">👋</div>
+                    <h3>Start the Conversation</h3>
+                    <p style="font-size: 0.88rem;">Say hello to {{ other_user['name'] }}! Ask about their experience, industry advice, or mentorship opportunities.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Chat Footer & Input Form -->
+        <div class="chat-footer">
+            <form method="POST" id="chatForm">
+                <input type="text" name="content" placeholder="Type your message here..." required autocomplete="off" style="flex: 1; border-radius: var(--radius-full); padding: 0.75rem 1.25rem;">
+                <button type="submit" class="btn btn-primary" style="border-radius: var(--radius-full); padding: 0.75rem 1.5rem;">
+                    <span>Send</span> ✈️
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-scroll chat to bottom
+    const chatBody = document.getElementById('chatBody');
+    if (chatBody) {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+</script>
+
+{% endblock %}

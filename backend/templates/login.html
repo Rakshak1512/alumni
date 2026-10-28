@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="login-box" style="max-width: 480px;">
+        <div class="login-header">
+            <div class="login-icon" id="headerIcon">🎓</div>
+            <h1 id="headerTitle">Welcome Back</h1>
+            <p class="welcome" id="headerSubtitle">Sign in with your verified credentials</p>
+        </div>
+
+        <!-- Role Tabs -->
+        <div class="role-tabs-container" style="display: flex; gap: 0.35rem; margin-bottom: 1.5rem; background: var(--bg-main, #f1f5f9); padding: 0.35rem; border-radius: var(--radius-md, 12px); border: 1px solid var(--border-light, #e2e8f0);">
+            <button type="button" class="role-tab active" onclick="switchLoginRole('student')" id="tab-student" style="flex: 1; padding: 0.55rem 0.4rem; font-size: 0.85rem; font-weight: 600; border: none; border-radius: var(--radius-sm, 8px); cursor: pointer; transition: all 0.2s ease; background: var(--primary, #3b82f6); color: white;">
+                🎓 Student
+            </button>
+            <button type="button" class="role-tab" onclick="switchLoginRole('alumni')" id="tab-alumni" style="flex: 1; padding: 0.55rem 0.4rem; font-size: 0.85rem; font-weight: 600; border: none; border-radius: var(--radius-sm, 8px); cursor: pointer; transition: all 0.2s ease; background: transparent; color: var(--text-muted, #64748b);">
+                💼 Alumni
+            </button>
+            <button type="button" class="role-tab" onclick="switchLoginRole('faculty')" id="tab-faculty" style="flex: 1; padding: 0.55rem 0.4rem; font-size: 0.85rem; font-weight: 600; border: none; border-radius: var(--radius-sm, 8px); cursor: pointer; transition: all 0.2s ease; background: transparent; color: var(--text-muted, #64748b);">
+                👨‍🏫 Faculty
+            </button>
+            <button type="button" class="role-tab" onclick="switchLoginRole('admin')" id="tab-admin" style="flex: 1; padding: 0.55rem 0.4rem; font-size: 0.85rem; font-weight: 600; border: none; border-radius: var(--radius-sm, 8px); cursor: pointer; transition: all 0.2s ease; background: transparent; color: var(--text-muted, #64748b);">
+                🛡️ Admin
+            </button>
+        </div>
+
+        <form method="POST">
+            <input type="hidden" name="role" id="roleInput" value="student">
+
+            <!-- Student / Alumni: Username -->
+            <div class="form-group" id="usernameGroup">
+                <label for="username">Username <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="username" name="username" placeholder="Enter your username" autocomplete="username">
+                </div>
+            </div>
+
+            <!-- Student / Alumni: UUCMS ID -->
+            <div class="form-group" id="uucmsGroup">
+                <label for="uucms_id">UUCMS ID <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="uucms_id" name="uucms_id" placeholder="e.g. U03AC21S0012">
+                </div>
+            </div>
+
+            <!-- Faculty: Faculty ID -->
+            <div class="form-group" id="facultyIdGroup" style="display: none;">
+                <label for="faculty_id">Faculty ID <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="faculty_id" name="faculty_id" placeholder="e.g. FAC1042">
+                </div>
+            </div>
+
+            <!-- Faculty: Name -->
+            <div class="form-group" id="nameGroup" style="display: none;">
+                <label for="name">Full Name <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="name" name="name" placeholder="Enter your full name">
+                </div>
+            </div>
+
+            <!-- Admin: Email or Username -->
+            <div class="form-group" id="emailGroup" style="display: none;">
+                <label for="email">Administrator Username or Email <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="text" id="email" name="email" placeholder="testadmin or admin@college.edu" autocomplete="username">
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password">Password <span style="color: var(--danger, #ef4444);">*</span></label>
+                <div class="input-box">
+                    <input type="password" name="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+                    <span class="eye" onclick="togglePassword()" title="Toggle password visibility">👁️</span>
+                </div>
+            </div>
+
+            <button type="submit" class="login-btn" id="submitBtn">
+                <span id="submitBtnText">Sign In as Student</span> →
+            </button>
+        </form>
+
+        <p class="register">
+            Don't have an account?
+            <a href="{{ url_for('register') }}">Create an Account</a>
+        </p>
+
+        <!-- Test Users Section (Click to Auto-Fill) -->
+        <div class="test-users-section" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px dashed var(--border-light, #e2e8f0);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #64748b);">
+                    ⚡ Quick Test Users (Click to Fill)
+                </span>
+                <span class="tag tag-primary" style="font-size: 0.7rem; padding: 0.15rem 0.5rem; background: var(--primary-light, #eff6ff); color: var(--primary, #3b82f6); border-radius: 4px; font-weight: 600;">
+                    TEST USER
+                </span>
+            </div>
+
+            <div class="test-users-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem;">
+                <!-- Student Test User Card -->
+                <button type="button" class="test-user-card" onclick="fillTestUser('student', 'teststudent', 'TESTUUCMS001', 'Student@123')" title="Click to fill Student credentials" style="text-align: left; padding: 0.65rem 0.75rem; background: var(--bg-main, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: var(--radius-sm, 8px); cursor: pointer; transition: all 0.2s ease;">
+                    <div style="font-weight: 600; font-size: 0.82rem; color: var(--text-main, #1e293b); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.25rem;">
+                        <span>🎓</span> <span>Student</span>
+                    </div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted, #64748b); line-height: 1.35;">
+                        <div>User: <b>teststudent</b></div>
+                        <div>UUCMS: <b>TESTUUCMS001</b></div>
+                        <div>Pass: <b>Student@123</b></div>
+                    </div>
+                </button>
+
+                <!-- Alumni Test User Card -->
+                <button type="button" class="test-user-card" onclick="fillTestUser('alumni', 'testalumni', 'TESTALUMNI001', 'Alumni@123')" title="Click to fill Alumni credentials" style="text-align: left; padding: 0.65rem 0.75rem; background: var(--bg-main, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: var(--radius-sm, 8px); cursor: pointer; transition: all 0.2s ease;">
+                    <div style="font-weight: 600; font-size: 0.82rem; color: var(--text-main, #1e293b); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.25rem;">
+                        <span>💼</span> <span>Alumni</span>
+                    </div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted, #64748b); line-height: 1.35;">
+                        <div>User: <b>testalumni</b></div>
+                        <div>UUCMS: <b>TESTALUMNI001</b></div>
+                        <div>Pass: <b>Alumni@123</b></div>
+                    </div>
+                </button>
+
+                <!-- Faculty Test User Card -->
+                <button type="button" class="test-user-card" onclick="fillTestUser('faculty', 'TESTFAC001', 'Test Faculty', 'Faculty@123')" title="Click to fill Faculty credentials" style="text-align: left; padding: 0.65rem 0.75rem; background: var(--bg-main, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: var(--radius-sm, 8px); cursor: pointer; transition: all 0.2s ease;">
+                    <div style="font-weight: 600; font-size: 0.82rem; color: var(--text-main, #1e293b); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.25rem;">
+                        <span>👨‍🏫</span> <span>Faculty</span>
+                    </div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted, #64748b); line-height: 1.35;">
+                        <div>ID: <b>TESTFAC001</b></div>
+                        <div>Name: <b>Test Faculty</b></div>
+                        <div>Pass: <b>Faculty@123</b></div>
+                    </div>
+                </button>
+
+                <!-- Admin Test User Card -->
+                <button type="button" class="test-user-card" onclick="fillTestUser('admin', 'testadmin', '', 'Admin@123')" title="Click to fill Admin credentials" style="text-align: left; padding: 0.65rem 0.75rem; background: var(--bg-main, #f8fafc); border: 1px solid var(--border-light, #e2e8f0); border-radius: var(--radius-sm, 8px); cursor: pointer; transition: all 0.2s ease;">
+                    <div style="font-weight: 600; font-size: 0.82rem; color: var(--text-main, #1e293b); display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.25rem;">
+                        <span>🛡️</span> <span>Admin</span>
+                    </div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted, #64748b); line-height: 1.35;">
+                        <div>User: <b>testadmin</b></div>
+                        <div>Pass: <b>Admin@123</b></div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const password = document.getElementById("password");
+    const eye = document.querySelector(".eye");
+    if (password.type === "password") {
+        password.type = "text";
+        eye.innerHTML = "🙈";
+    } else {
+        password.type = "password";
+        eye.innerHTML = "👁️";
+    }
+}
+
+function switchLoginRole(role) {
+    document.getElementById("roleInput").value = role;
+
+    ['student', 'alumni', 'faculty', 'admin'].forEach(r => {
+        const tab = document.getElementById('tab-' + r);
+        if (r === role) {
+            tab.style.background = 'var(--primary, #3b82f6)';
+            tab.style.color = 'white';
+        } else {
+            tab.style.background = 'transparent';
+            tab.style.color = 'var(--text-muted, #64748b)';
+        }
+    });
+
+    const usernameGroup = document.getElementById("usernameGroup");
+    const uucmsGroup = document.getElementById("uucmsGroup");
+    const facultyIdGroup = document.getElementById("facultyIdGroup");
+    const nameGroup = document.getElementById("nameGroup");
+    const emailGroup = document.getElementById("emailGroup");
+    const submitBtnText = document.getElementById("submitBtnText");
+    const headerIcon = document.getElementById("headerIcon");
+    const headerTitle = document.getElementById("headerTitle");
+    const headerSubtitle = document.getElementById("headerSubtitle");
+
+    const usernameInput = document.getElementById("username");
+    const uucmsInput = document.getElementById("uucms_id");
+    const facultyInput = document.getElementById("faculty_id");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+
+    usernameInput.required = false;
+    uucmsInput.required = false;
+    facultyInput.required = false;
+    nameInput.required = false;
+    emailInput.required = false;
+
+    if (role === 'student') {
+        usernameGroup.style.display = 'block';
+        uucmsGroup.style.display = 'block';
+        facultyIdGroup.style.display = 'none';
+        nameGroup.style.display = 'none';
+        emailGroup.style.display = 'none';
+
+        usernameInput.required = true;
+        uucmsInput.required = true;
+
+        headerIcon.textContent = '🎓';
+        headerTitle.textContent = 'Student Sign In';
+        headerSubtitle.textContent = 'Sign in with your Username, UUCMS ID, and Password';
+        submitBtnText.textContent = 'Sign In as Student';
+    } else if (role === 'alumni') {
+        usernameGroup.style.display = 'block';
+        uucmsGroup.style.display = 'block';
+        facultyIdGroup.style.display = 'none';
+        nameGroup.style.display = 'none';
+        emailGroup.style.display = 'none';
+
+        usernameInput.required = true;
+        uucmsInput.required = true;
+
+        headerIcon.textContent = '💼';
+        headerTitle.textContent = 'Alumni Sign In';
+        headerSubtitle.textContent = 'Sign in with your Username, UUCMS ID, and Password';
+        submitBtnText.textContent = 'Sign In as Alumni';
+    } else if (role === 'faculty') {
+        usernameGroup.style.display = 'none';
+        uucmsGroup.style.display = 'none';
+        facultyIdGroup.style.display = 'block';
+        nameGroup.style.display = 'block';
+        emailGroup.style.display = 'none';
+
+        facultyInput.required = true;
+        nameInput.required = true;
+
+        headerIcon.textContent = '👨‍🏫';
+        headerTitle.textContent = 'Faculty Sign In';
+        headerSubtitle.textContent = 'Sign in with your Faculty ID, Name, and Password';
+        submitBtnText.textContent = 'Sign In as Faculty';
+    } else if (role === 'admin') {
+        usernameGroup.style.display = 'none';
+        uucmsGroup.style.display = 'none';
+        facultyIdGroup.style.display = 'none';
+        nameGroup.style.display = 'none';
+        emailGroup.style.display = 'block';
+
+        emailInput.required = true;
+
+        headerIcon.textContent = '🛡️';
+        headerTitle.textContent = 'Administrator Sign In';
+        headerSubtitle.textContent = 'Sign in with your Administrator Email and Password';
+        submitBtnText.textContent = 'Sign In as Admin';
+    }
+}
+
+function fillTestUser(role, idOrUsername, uucmsOrName, password) {
+    switchLoginRole(role);
+    if (role === 'student' || role === 'alumni') {
+        const u = document.getElementById("username");
+        const uucms = document.getElementById("uucms_id");
+        const p = document.getElementById("password");
+        if (u) u.value = idOrUsername;
+        if (uucms) uucms.value = uucmsOrName;
+        if (p) p.value = password;
+    } else if (role === 'faculty') {
+        const fac = document.getElementById("faculty_id");
+        const n = document.getElementById("name");
+        const p = document.getElementById("password");
+        if (fac) fac.value = idOrUsername;
+        if (n) n.value = uucmsOrName;
+        if (p) p.value = password;
+    } else if (role === 'admin') {
+        const em = document.getElementById("email");
+        const p = document.getElementById("password");
+        if (em) em.value = idOrUsername;
+        if (p) p.value = password;
+    }
+}
+</script>
+{% endblock %}

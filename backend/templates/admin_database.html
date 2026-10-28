@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <h1>SQLite Database Viewer</h1>
+            <span class="tag tag-success" style="font-size: 0.8rem; padding: 0.3rem 0.8rem;">● {{ db_status }}</span>
+        </div>
+        <p style="margin-top: 0.35rem;">
+            Read-only development database explorer inspecting <code>{{ db_path }}</code>
+        </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">
+            👥 Admin Users
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Database Stats Summary Bar -->
+<div class="card" style="padding: 1.25rem 1.5rem; margin-bottom: 2rem; background: var(--gradient-card); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.85rem;">
+        <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+            🗄️
+        </div>
+        <div>
+            <strong style="color: var(--text-main); font-size: 0.95rem;">Database File:</strong>
+            <span style="font-family: monospace; font-size: 0.85rem; color: var(--text-muted); display: block; word-break: break-all;">
+                {{ db_path }}
+            </span>
+        </div>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <span class="tag tag-primary" style="font-size: 0.85rem; padding: 0.4rem 0.9rem;">
+            {{ tables_info|length }} Tables Discovered
+        </span>
+    </div>
+</div>
+
+<!-- Main 2-Column Layout: Table List + Data Table -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) 3fr; gap: 1.5rem; align-items: flex-start;">
+    
+    <!-- Left Column: Tables Sidebar -->
+    <div class="card" style="padding: 0; overflow: hidden; position: sticky; top: 90px;">
+        <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-light); background: #ffffff;">
+            <h3 style="font-size: 1rem; margin: 0;">Available Tables</h3>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+            {% for t in tables_info %}
+            <a href="{{ url_for('admin_database', table=t.name) }}" 
+               style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border-light); text-decoration: none; font-weight: 600; font-size: 0.92rem; transition: background 0.15s ease; {% if t.name == selected_table %}background: var(--primary-light); color: var(--primary-hover); border-left: 4px solid var(--primary);{% else %}color: var(--text-main);{% endif %}">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>📋</span>
+                    <span>{{ t.name }}</span>
+                </span>
+                <span class="tag {% if t.name == selected_table %}tag-primary{% else %}tag-neutral{% endif %}" style="font-size: 0.75rem;">
+                    {{ t.count }} row{% if t.count != 1 %}s{% endif %}
+                </span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Right Column: Table Viewer & Data Table -->
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <!-- Table Search & Info Bar -->
+        <div class="card" style="margin-bottom: 0; padding: 1.25rem 1.5rem;">
+            <form method="GET" action="{{ url_for('admin_database') }}" style="background: transparent; padding: 0; border: none; box-shadow: none; display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                <input type="hidden" name="table" value="{{ selected_table }}">
+                
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <h2 style="font-size: 1.35rem; margin: 0; color: var(--text-main);">
+                        Table: <span style="color: var(--primary);">{{ selected_table }}</span>
+                    </h2>
+                    <span class="tag tag-neutral" style="font-size: 0.8rem;">
+                        {{ total_records }} record{% if total_records != 1 %}s{% endif %} found
+                    </span>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <input type="text" name="q" value="{{ search_query or '' }}" placeholder="Search rows..." style="padding: 0.45rem 0.85rem; font-size: 0.88rem; width: 220px;">
+                    <button type="submit" class="btn btn-sm btn-primary" style="margin: 0;">🔍 Search</button>
+                    {% if search_query %}
+                    <a href="{{ url_for('admin_database', table=selected_table) }}" class="btn btn-sm btn-secondary" style="margin: 0;">Reset</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Security Note Banner -->
+        <div style="display: flex; align-items: center; gap: 0.5rem; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-md); padding: 0.65rem 1rem; font-size: 0.85rem; color: #065f46;">
+            <span>🔒</span>
+            <span><strong>Read-Only Mode:</strong> Passwords, password hashes, and sensitive secrets are automatically masked & filtered for security.</span>
+        </div>
+
+        <!-- Table Data -->
+        <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 0;">
+            {% if rows %}
+            <div style="overflow-x: auto; max-height: 580px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; background: #f1f5f9;">#</th>
+                            {% for col in columns %}
+                            <th>{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: 0.8rem; background: #f8fafc;">
+                                {{ loop.index + (page - 1) * 25 }}
+                            </td>
+                            {% for col in columns %}
+                            <td>
+                                {% if row[col] is none %}
+                                <span style="color: var(--text-subtle); font-style: italic;">NULL</span>
+                                {% elif col == 'status' %}
+                                <span class="tag {% if row[col] == 'active' %}tag-success{% else %}tag-warning{% endif %}" style="font-size: 0.75rem;">
+                                    {{ row[col] }}
+                                </span>
+                                {% elif col == 'role' %}
+                                <span class="tag {% if row[col] == 'admin' %}tag-danger{% elif row[col] == 'alumni' %}tag-primary{% elif row[col] == 'faculty' %}tag-warning{% else %}tag-neutral{% endif %}" style="font-size: 0.75rem;">
+                                    {{ row[col] }}
+                                </span>
+                                {% else %}
+                                <span style="font-size: 0.9rem; word-break: break-word;">{{ row[col] }}</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <div style="padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-light); background: #ffffff;">
+                <span style="font-size: 0.85rem; color: var(--text-muted);">
+                    Page {{ page }} of {{ total_pages }} ({{ total_records }} rows)
+                </span>
+                <div style="display: flex; gap: 0.5rem;">
+                    {% if page > 1 %}
+                    <a href="{{ url_for('admin_database', table=selected_table, page=page-1, q=search_query) }}" class="btn btn-sm btn-secondary">
+                        ← Previous
+                    </a>
+                    {% endif %}
+                    {% if page < total_pages %}
+                    <a href="{{ url_for('admin_database', table=selected_table, page=page+1, q=search_query) }}" class="btn btn-sm btn-secondary">
+                        Next →
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="empty-state" style="margin: 0; border: none; border-radius: 0;">
+                <div class="empty-state-icon">🗄️</div>
+                <h3>No records found</h3>
+                <p>No rows in table <code>{{ selected_table }}</code> matched your search query.</p>
+                {% if search_query %}
+                <a href="{{ url_for('admin_database', table=selected_table) }}" class="btn btn-secondary">Clear Search</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

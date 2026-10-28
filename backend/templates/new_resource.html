@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <h1>Share a Learning Resource</h1>
+        <p>Upload helpful documents, reference books, preparation links, or YouTube video tutorials.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('list_resources') }}" class="btn btn-secondary">← Back to Resources</a>
+    </div>
+</div>
+
+<div style="max-width: 700px; margin: 0 auto;">
+    <form method="POST" enctype="multipart/form-data" class="card">
+        <div class="form-group">
+            <label for="title">Resource Title <span style="color: var(--danger);">*</span></label>
+            <input type="text" id="title" name="title" placeholder="e.g. Complete System Design Guide / DSA Roadmap" required>
+        </div>
+
+        <div class="form-group">
+            <label for="link">External Link <span class="hint">(YouTube video URL, Github repository, or article)</span></label>
+            <input type="url" id="link" name="link" placeholder="https://youtube.com/watch?v=... or https://github.com/...">
+        </div>
+
+        <div class="form-group">
+            <label for="file">Or Upload a File Attachment <span class="hint">(PDF, DOC, ZIP, or Slides)</span></label>
+            <input type="file" id="file" name="file">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Summary / Overview</label>
+            <textarea id="description" name="description" rows="4" placeholder="Briefly describe what students will learn from this resource..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-light);">
+            <a href="{{ url_for('list_resources') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <span>Publish Resource</span> →
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
