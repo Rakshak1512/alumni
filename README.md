@@ -114,7 +114,7 @@ The login page's test-user cards only fill credentials into the form; they do no
    python backend/seed_demo_users.py
    ```
 4. Confirm the output says the expected records were verified, then remove `SEED_DEMO_USERS` from the environment. The script never overwrites existing accounts.
-5. For hosted backend deployments, run the command once from the provider's shell/console with the same protected Firebase credentials. Do not put test passwords or service-account secrets in frontend environment variables.
+5. For hosted deployments without a shell, use the protected one-time bootstrap endpoint described below. Do not put test passwords or service-account secrets in frontend environment variables.
 
 Demo credentials:
 - Student: username `teststudent`, UUCMS `TESTUUCMS001`, password `Student@123`
@@ -123,6 +123,31 @@ Demo credentials:
 - Admin: username `testadmin`, password `Admin@123`
 
 These credentials are public and intended only for a disposable test project. Do not seed them into a production database with real users.
+
+## 🧪 Create a fresh demo/test database and provision test users
+
+To isolate test credentials from real accounts, create a **separate Firebase project** for the demo deployment and enable **Cloud Firestore in Native mode** in that project. This repository cannot create a Firebase project inside your Google account.
+
+1. In Firebase Console, create a new project dedicated to testing, then create its Firestore database.
+2. In Google Cloud Console for that project, create a service account with access to Firestore and generate a JSON key. Keep the key private; never commit it to Git.
+3. In the Vercel **backend** project, set these private environment variables for Production:
+   - `FIREBASE_PROJECT_ID`: the new test Firebase project ID.
+   - `FIREBASE_SERVICE_ACCOUNT_JSON`: the complete service-account JSON content, stored as a secret environment variable.
+   - `FLASK_SECRET_KEY` and `JWT_SECRET`: separate strong random values.
+   - `FRONTEND_ORIGIN=https://alumni-vysa.vercel.app`.
+   - `ENABLE_DEMO_USER_BOOTSTRAP=true`.
+   - `DEMO_BOOTSTRAP_TOKEN`: a long random one-time token. Generate one locally with `python -c "import secrets; print(secrets.token_urlsafe(48))"`.
+4. Redeploy the backend. Check `/api/health`; it must report `"status": "ok"` and `"database": "connected"`.
+5. From PowerShell, invoke the endpoint once, replacing the token with the value configured in Vercel:
+   ```powershell
+   $token = Read-Host "Enter the DEMO_BOOTSTRAP_TOKEN"
+   Invoke-RestMethod -Method Post -Uri "https://alumni-ry3u.vercel.app/api/admin/bootstrap-demo-users" -Headers @{ Authorization = "Bearer $token" }
+   ```
+   The response must list all four verified test usernames. If it fails, check the backend runtime logs and Firestore project/service-account configuration.
+6. Immediately set `ENABLE_DEMO_USER_BOOTSTRAP=false`, remove `DEMO_BOOTSTRAP_TOKEN`, and redeploy the backend. The seeded accounts remain in the test database.
+7. If local testing should use the same test data, update only your local, ignored `backend/.env` with the same test-project ID and service-account credentials. Do not commit `.env` or key files.
+
+Demo credentials are intentionally public and must be used **only** in the dedicated test database, never in a database containing real users. Pointing the backend to a new Firestore project intentionally gives the app a clean data store; records from the old project are not automatically copied.
 
 ## 🚀 Production deployment (Flask + Firestore)
 

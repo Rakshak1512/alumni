@@ -10,6 +10,7 @@ import os
 import re
 import uuid
 import hashlib
+import hmac
 import secrets
 import smtplib
 from email.message import EmailMessage
@@ -97,6 +98,35 @@ def api_health():
             "database": "unavailable",
             "message": "Check Firebase project ID, service-account configuration, and Firestore access."
         }), 503
+
+
+@app.route("/api/admin/bootstrap-demo-users", methods=["POST"])
+def api_bootstrap_demo_users():
+    """One-time, token-protected setup for a dedicated demo/test Firestore project."""
+    enabled = os.getenv("ENABLE_DEMO_USER_BOOTSTRAP", "").strip().lower() in {"1", "true", "yes"}
+    configured_token = os.getenv("DEMO_BOOTSTRAP_TOKEN", "").strip()
+    if not enabled or not configured_token:
+        return jsonify({"error": "Not found"}), 404
+
+    supplied = request.headers.get("Authorization", "")
+    if not hmac.compare_digest(supplied, f"Bearer {configured_token}"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        from seed_demo_users import bootstrap_demo_users
+        result = bootstrap_demo_users()
+    except Exception:
+        app.logger.exception("Demo-user bootstrap failed")
+        return jsonify({
+            "error": "Demo-user bootstrap failed. Check backend runtime logs and the configured Firestore credentials."
+        }), 500
+
+    return jsonify({
+        "message": "Demo accounts verified in the configured Firestore database.",
+        "created": result["created"],
+        "repaired": result["repaired"],
+        "verified": result["verified"],
+    }), 200
 
 
 def _jwt_secret():

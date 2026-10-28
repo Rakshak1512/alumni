@@ -15,11 +15,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 HERE = Path(__file__).resolve().parent
 load_dotenv(HERE / ".env")
 
-if os.getenv("SEED_DEMO_USERS", "").strip().lower() not in {"1", "true", "yes"}:
-    print("Refusing to seed demo users.")
-    print("Set SEED_DEMO_USERS=true in backend/.env after confirming this is a test Firebase project.")
-    raise SystemExit(2)
-
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import firebase_db  # noqa: E402
@@ -104,7 +99,7 @@ DEMO_USERS = [
 ]
 
 
-def main():
+def bootstrap_demo_users():
     firebase_db.get_firestore_client()  # Fail early if credentials/database access are invalid.
     created, repaired = [], []
 
@@ -166,8 +161,21 @@ def main():
 
     if failures:
         print("Failed demo-account checks: " + ", ".join(failures))
-        raise SystemExit(1)
+        raise RuntimeError("Failed demo-account checks: " + ", ".join(failures))
     print("\nAll four demo accounts are ready in Firestore.")
+    return {
+        "created": created,
+        "repaired": repaired,
+        "verified": [user["username"] for user in DEMO_USERS],
+    }
+
+
+def main():
+    if os.getenv("SEED_DEMO_USERS", "").strip().lower() not in {"1", "true", "yes"}:
+        print("Refusing to seed demo users.")
+        print("Set SEED_DEMO_USERS=true in backend/.env after confirming this is a dedicated test Firebase project.")
+        raise SystemExit(2)
+    bootstrap_demo_users()
 
 
 if __name__ == "__main__":
