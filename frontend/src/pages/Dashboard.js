@@ -384,15 +384,6 @@ export async function initDashboard() {
                     </div>
                 </div>
 
-                <div class="card" style="margin-bottom: 0; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
-                    <div style="width: 46px; height: 46px; border-radius: var(--radius-md); background: #fdf2f8; color: #db2777; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
-                        🤖
-                    </div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 0.95rem;">AI Assistant</div>
-                        <a href="#/chatbot" style="font-size: 0.82rem; font-weight: 600;">Ask Career Questions →</a>
-                    </div>
-                </div>
 
                 <div class="card" style="margin-bottom: 0; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
                     <div style="width: 46px; height: 46px; border-radius: var(--radius-md); background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">

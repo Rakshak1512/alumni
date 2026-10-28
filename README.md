@@ -15,7 +15,6 @@ A premium, modern 3D web platform connecting verified alumni with students for 1
 - **Alumni Directory & Geo-Map**: Search graduates by branch, company, grad year, or geographical distribution.
 - **Resource Vault**: Shared study roadmaps, interview preparation notes, and YouTube video tutorials.
 - **Encrypted Messaging & Live Video**: 1-on-1 instant chat bubbles and integrated peer-to-peer video rooms.
-- **AI Career Assistant**: Conversational AI assistant for resume suggestions, project ideas, and interview preparation.
 
 ---
 
@@ -42,7 +41,7 @@ alumni_portal/
 │       ├── api.js                # Central REST client
 │       ├── state.js              # Auth & session store
 │       ├── style.css             # Unified 3D design system & tokens
-│       └── pages/                # Modular page components (all 18 SPA views)
+│       └── pages/                # Modular page components (all 17 SPA views)
 │
 ├── app.py                        # Root delegate entrypoint
 ├── README.md                     # Documentation
@@ -135,12 +134,13 @@ The repository includes a root `requirements.txt` and `Procfile`. On Render, cre
 
 Set these backend environment values in the hosting dashboard (do not commit private values):
 
+- `JWT_SECRET`: generate a strong value with `python -c "import secrets; print(secrets.token_hex(32))"`.
 - `FLASK_SECRET_KEY`: generate a strong value with `python -c "import secrets; print(secrets.token_hex(32))"`
 - `FIREBASE_PROJECT_ID`: `alumni-5edf6` if that is the project containing your Firestore data.
 - `FIREBASE_CREDENTIALS_PATH`: the actual mounted service-account secret-file path, such as `/etc/secrets/firebase-service-account.json`; or configure `FIREBASE_SERVICE_ACCOUNT_JSON` as a protected secret.
 - `FRONTEND_ORIGIN`: the exact deployed frontend origin (scheme + hostname only, no path). Comma-separate multiple exact origins if needed.
 
-For the frontend's hosting build environment, set `VITE_API_BASE_URL` to the deployed backend's HTTPS origin, then rebuild/redeploy the frontend. Vite embeds this value at build time.
+For the frontend Vercel project (`alumni-vysa.vercel.app`), set Root Directory to `frontend`, Framework Preset to Vite, Build Command to `npm run build`, and Output Directory to `dist`. Set `VITE_API_BASE_URL=https://alumni-ry3u.vercel.app` in the frontend project's production environment and redeploy. The frontend API client also uses this backend URL as a fallback. Vite embeds this value at build time.
 
 After deployment, open `https://YOUR-BACKEND-URL/api/health`. A healthy response reports `"status": "ok"` and `"database": "connected"`. A 503 response means the backend cannot connect to Firestore: verify the project ID, service-account file path/JSON, and Firestore access. Check server logs for the underlying error.
 

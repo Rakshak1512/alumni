@@ -8,7 +8,7 @@ const isLocalDevelopment = typeof window !== 'undefined' &&
     ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const configuredBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
 const rawBaseUrl = configuredBaseUrl ||
-    (isLocalDevelopment ? 'http://127.0.0.1:5000' : 'https://alumni-qk5y-nine.vercel.app');
+    (isLocalDevelopment ? 'http://127.0.0.1:5000' : 'https://alumni-ry3u.vercel.app');
 const BASE_URL = rawBaseUrl.replace(/\/+$/, '');
 const TOKEN_KEY = 'alumni_auth_token';
 

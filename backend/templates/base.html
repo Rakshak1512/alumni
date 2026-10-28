@@ -91,9 +91,6 @@
             <a href="{{ url_for('messages_list') }}" class="nav-item {% if request.endpoint in ['messages_list', 'chat'] %}active{% endif %}">
                 <span class="icon">💬</span> <span>Messages</span>
             </a>
-            <a href="{{ url_for('chatbot') }}" class="nav-item {% if request.endpoint == 'chatbot' %}active{% endif %}">
-                <span class="icon">🤖</span> <span>AI Assistant</span>
-            </a>
             <a href="{{ url_for('alumni_by_location') }}" class="nav-item {% if request.endpoint == 'alumni_by_location' %}active{% endif %}">
                 <span class="icon">📍</span> <span>Alumni Map</span>
             </a>

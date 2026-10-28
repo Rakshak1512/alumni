@@ -61,8 +61,7 @@ _local_origins = [
     "http://localhost:5000", "http://127.0.0.1:5000",
 ]
 _configured_origins = [
-    "https://alumni-24ce.vercel.app",
-    "https://alumni-three-theta.vercel.app",
+    "https://alumni-vysa.vercel.app",
     *[
         origin.strip().rstrip("/")
         for origin in (os.getenv("FRONTEND_URL", "") + "," + os.getenv("FRONTEND_ORIGIN", "")).split(",")

@@ -15,7 +15,6 @@ import { renderNewResource, initNewResource } from './pages/NewResource.js';
 import { renderAnnouncements, initAnnouncements } from './pages/Announcements.js';
 import { renderMessagesList, initMessagesList } from './pages/MessagesList.js';
 import { renderChat, initChat } from './pages/Chat.js';
-import { renderChatbot, initChatbot } from './pages/Chatbot.js';
 import { renderVideoCall, initVideoCall } from './pages/VideoCall.js';
 import { renderProfile, initProfile } from './pages/Profile.js';
 import { renderAdminUsers, initAdminUsers } from './pages/AdminUsers.js';
@@ -158,9 +157,6 @@ function renderShell(contentHtml, currentPath) {
             <a href="#/messages" class="nav-item ${currentPath.startsWith('/messages') || currentPath.startsWith('/chat') ? 'active' : ''}">
                 <span class="icon">💬</span> <span>Messages</span>
             </a>
-            <a href="#/chatbot" class="nav-item ${currentPath === '/chatbot' ? 'active' : ''}">
-                <span class="icon">🤖</span> <span>AI Assistant</span>
-            </a>
             <a href="#/alumni/by-location" class="nav-item ${currentPath === '/alumni/by-location' ? 'active' : ''}">
                 <span class="icon">📍</span> <span>Alumni Map</span>
             </a>
@@ -283,9 +279,6 @@ async function handleRouting() {
         const otherId = path.split('/')[2];
         pageHtml = renderVideoCall(otherId);
         initFunc = () => initVideoCall(otherId);
-    } else if (path === '/chatbot') {
-        pageHtml = renderChatbot();
-        initFunc = initChatbot;
     } else if (path === '/profile') {
         pageHtml = renderProfile();
         initFunc = initProfile;
