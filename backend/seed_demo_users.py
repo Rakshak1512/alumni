@@ -3,7 +3,8 @@ Create the four demo accounts displayed on the Alumni login page.
 
 This is an explicit, manual operation. It never runs automatically at app startup.
 Run only against a dedicated demo/test Firebase project, not a production project
-containing real users. Existing accounts are never overwritten.
+containing real users. Only the four explicitly named demo identities below may be
+created or repaired; no other user records are changed.
 """
 import os
 import sys
